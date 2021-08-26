@@ -6,15 +6,21 @@
   "dependencies": {
     "jsx-transform": "^2.4.1",
     "magic-string": "^0.25.7",
+    "parcel": "^2.0.0-rc.0",
     "react": "^16.11.0",
+    "react-dom": "^17.0.2",
     "react-reconciler": "^0.23.0",
     "rollup": "^2.56.3",
     "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-pluginutils": "^2.8.2"
+    "rollup-pluginutils": "^2.8.2",
+    "tiny-uuid": "^1.0.0"
   },
   "scripts": {
     "dev": "rollup -c rollup/rollup.config.js --watch",
-    "build": "rollup -c rollup/rollup.config.js"
+    "build": "rollup -c rollup/rollup.config.js",
+    "sample": "parcel src/samples/*"
   }
 }

@@ -10,7 +10,35 @@ extern "C" {
 #include <streambuf>
 #include <string>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
+
+// if != 0, then there is data to be read on stdin
+int kbhit(int timeout = 500)
+{
+    // timeout structure passed into select
+    struct timeval tv;
+    // fd_set passed into select
+    fd_set fds;
+    // Set up the timeout.  here we can wait for 1 second
+    tv.tv_sec = 0;
+    tv.tv_usec = timeout;
+
+    // Zero out the fd_set - make sure it's pristine
+    FD_ZERO(&fds);
+    // Set the FD that we want to read
+    FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
+    // select takes the last file descriptor value + 1 in the fdset to check,
+    // the fdset for reads, writes, and errors.  We are only passing in reads.
+    // the last parameter is the timeout.  select will return if an FD is ready or
+    // the timeout has occurred
+    select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
+    // return 0 if STDIN is not ready to be read.
+
+    return FD_ISSET(STDIN_FILENO, &fds);
+}
 
 static JSRuntime* rt = 0;
 static JSContext* ctx = 0;
@@ -18,7 +46,7 @@ static JSContext* ctx = 0;
 static JSValue js_log(JSContext* ctx, JSValueConst this_val,
     int argc, JSValueConst* argv)
 {
-    std::cout << "log..." << std::endl;
+    std::cout << "log: ";
     int i;
     const char* str;
 
@@ -103,7 +131,31 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    std::string input;
     while(true) {
+
+        if (kbhit(500)) {
+            std::cout << "?" << std::endl;
+            char seq[4];
+            read(STDIN_FILENO, &seq[0], 1);
+            input += seq[0];
+
+            std::cout << seq[0];
+            switch(seq[0]) {
+            case 13: {
+
+                JSValue ret = JS_Eval(ctx, input.c_str(), input.length(), "<input>", JS_EVAL_TYPE_GLOBAL);
+                if (JS_IsException(ret)) {
+                    js_std_dump_error(ctx);
+                    JS_ResetUncatchableError(ctx);
+                    return 0;
+                }
+
+                break;
+            }
+            }
+        }
+
         js_std_loop(ctx);
         usleep(5000);
     }
