@@ -1,7 +1,10 @@
 import React from 'react'
 import uuid from 'tiny-uuid'
+import Text from './text'
+import View from './view'
 
 const { Component, Fragment } = React
+
 class App extends Component {
   constructor () {
     super()
@@ -23,6 +26,7 @@ class App extends Component {
         <Fragment key='2'>
         p:{p} 
         </Fragment>
+        <View key='4'><Text key='3'></Text></View>
       </Fragment>
     )
   }
