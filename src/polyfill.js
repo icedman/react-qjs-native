@@ -18,12 +18,14 @@ class Elm {
         this.type = t;
         this.children = [];
         this.attributes = {};
+        this.style = {};
+        console.log(JSON.stringify(this));
     }
 
     appendChild(c) {
         c._parent = this._id;
         this.children.push(c);
-        console.log(JSON.stringify(c));
+        // console.log(JSON.stringify(c));
     }
 
     removeChild(c) {

@@ -5,6 +5,7 @@ import View from './view'
 
 const { Component, Fragment } = React
 
+
 class App extends Component {
   constructor () {
     super()
@@ -17,7 +18,7 @@ class App extends Component {
 
   render () {
     const { hello, p } = this.state
-    console.log(JSON.stringify(this.state))
+    // console.log(JSON.stringify(this.state))
     return (
       <Fragment>
         <Fragment key='1'>
@@ -26,7 +27,7 @@ class App extends Component {
         <Fragment key='2'>
         p:{p} 
         </Fragment>
-        <View key='4'><Text key='3'></Text></View>
+        <View key='4'><Text key='3'>xxx</Text></View>
       </Fragment>
     )
   }
@@ -39,5 +40,26 @@ class App extends Component {
     setTimeout(() => this.setState({ hello: '', p: -1 }), 4000)
   }
 }
+
+/*
+
+class App extends Component {
+  render() {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#8BBDD9',
+          height: 400
+        }}
+      >
+        <Text>Hello React Native Custom Renderer</Text>
+      </View>
+    );
+  }
+}
+*/
 
 export default App

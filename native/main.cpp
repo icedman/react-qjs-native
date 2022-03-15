@@ -135,20 +135,23 @@ int main(int argc, char **argv)
     while(true) {
 
         if (kbhit(500)) {
-            std::cout << "?" << std::endl;
+            // std::cout << "?" << std::endl;
             char seq[4];
             read(STDIN_FILENO, &seq[0], 1);
             input += seq[0];
 
-            std::cout << seq[0];
+            // std::cout << seq[0];
+
             switch(seq[0]) {
+            case 10:
             case 13: {
 
                 JSValue ret = JS_Eval(ctx, input.c_str(), input.length(), "<input>", JS_EVAL_TYPE_GLOBAL);
+                input = "";
                 if (JS_IsException(ret)) {
                     js_std_dump_error(ctx);
                     JS_ResetUncatchableError(ctx);
-                    return 0;
+                    // return 0;
                 }
 
                 break;

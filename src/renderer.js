@@ -1,6 +1,17 @@
 import React from 'react';
 import Reconciler from 'react-reconciler';
 import uuid from 'tiny-uuid'
+import { isUnitlessProperty } from './css';
+
+const getCircularReplacer = () => {
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (key === 'children') {
+      return value.map(c => c._id);
+    }
+    return value;
+  };
+};
 
 function setStyles(domElement, styles) {
   Object.keys(styles).forEach(name => {
@@ -63,7 +74,7 @@ const hostConfig = {
       const propValue = props[propName];
 
       if (propName === 'style') {
-        // setStyles(domElement, propValue);
+        setStyles(domElement, propValue);
       } else if (propName === 'children') {
         // Set the textContent only for literal string or number children, whereas
         // nodes will be appended in `appendChild`
@@ -93,7 +104,6 @@ const hostConfig = {
 
   // Calculate the updatePayload
   prepareUpdate(domElement, type, oldProps, newProps) {
-    // Return a diff between the new and the old props
     return shallowDiff(oldProps, newProps);
   },
 
@@ -167,7 +177,8 @@ const hostConfig = {
           return acc;
         }, {});
 
-        // setStyles(domElement, finalStyles);
+        setStyles(domElement, finalStyles);
+
       } else if (newProps[propName] || typeof newProps[propName] === 'number') {
         // if (isEventName(propName)) {
         //   const eventName = propName.toLowerCase().replace('on', '');
@@ -181,9 +192,11 @@ const hostConfig = {
         //   const eventName = propName.toLowerCase().replace('on', '');
           // domElement.removeEventListener(eventName, oldProps[propName]);
         // } else {
-          // domElement.removeAttribute(propName);
+          domElement.removeAttribute(propName);
         // }
       }
+
+      // console.log(JSON.stringify(domElement, getCircularReplacer(), null, 4));
     });
   },
 

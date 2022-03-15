@@ -4,6 +4,16 @@ const { Component, Fragment } = React
 
 export default class View extends Component {
   render() {
-    return <view>{this.props.children}</view>;
+    return (
+      <view
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          ...this.props.style
+        }}
+      >
+        {this.props.children}
+      </view>
+    );
   }
 }
