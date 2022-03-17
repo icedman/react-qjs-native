@@ -10,7 +10,6 @@ class App extends Component {
   constructor () {
     super()
     this.state = {
-      _id: uuid(),
       hello: 'Hello React!',
       p: 0
     }
@@ -34,7 +33,6 @@ class App extends Component {
 
   componentDidMount () {
     console.log('APP DID MOUNT!')
-
     // XXX: Emulate event driven update
     setTimeout(() => this.setState({ hello: 'Hello Pi!', p: 42 }), 2000)
     setTimeout(() => this.setState({ hello: '', p: -1 }), 4000)

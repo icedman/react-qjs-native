@@ -80,6 +80,7 @@ const hostConfig = {
         // nodes will be appended in `appendChild`
         if (typeof propValue === 'string' || typeof propValue === 'number') {
           domElement.textContent = propValue;
+          domElement.setAttribute('textContent', propValue);
         }
       } else if (propName === 'className') {
         domElement.setAttribute('class', propValue);
@@ -156,60 +157,21 @@ const hostConfig = {
   },
 
   commitUpdate(domElement, updatePayload, type, oldProps, newProps, internalInstanceHandle) {
-    updatePayload.forEach(propName => {
-      // children changes is done by the other methods like `commitTextUpdate`
-      if (propName === 'children') {
-        const propValue = newProps[propName];
-        if (typeof propValue === 'string' || typeof propValue === 'number') {
-          domElement.textContent = propValue;
-        }
-        return;
-      }
 
-      if (propName === 'style') {
-        // Return a diff between the new and the old styles
-        const styleDiffs = shallowDiff(oldProps.style, newProps.style);
-        const finalStyles = styleDiffs.reduce((acc, styleName) => {
-          // Style marked to be unset
-          if (!newProps.style[styleName]) acc[styleName] = '';
-          else acc[styleName] = newProps.style[styleName];
-
-          return acc;
-        }, {});
-
-        setStyles(domElement, finalStyles);
-
-      } else if (newProps[propName] || typeof newProps[propName] === 'number') {
-        // if (isEventName(propName)) {
-        //   const eventName = propName.toLowerCase().replace('on', '');
-          // domElement.removeEventListener(eventName, oldProps[propName]);
-          // domElement.addEventListener(eventName, newProps[propName]);
-        // } else {
-          domElement.setAttribute(propName, newProps[propName]);
-        // }
-      } else {
-        // if (isEventName(propName)) {
-        //   const eventName = propName.toLowerCase().replace('on', '');
-          // domElement.removeEventListener(eventName, oldProps[propName]);
-        // } else {
-          domElement.removeAttribute(propName);
-        // }
-      }
-
-      // console.log(JSON.stringify(domElement, getCircularReplacer(), null, 4));
-    });
   },
 
   commitMount(domElement, type, newProps, internalInstanceHandle) {
     domElement.focus();
   },
 
-  commitTextUpdate(textInstance, oldText, newText) {
-    textInstance.nodeValue = newText;
+  commitTextUpdate(domElement, oldText, newText) {
+    // textInstance.nodeValue = newText;
+    domElement.setAttribute('textContent', newText);
   },
 
   resetTextContent(domElement) {
     domElement.textContent = '';
+    domElement.setAttribute('textContent', '');
   },
 };
 
