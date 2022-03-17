@@ -3,6 +3,7 @@
 // import * as os from 'os'
 
 import uuid from 'tiny-uuid'
+import { isUnitlessProperty } from './css';
 
 globalThis.process = { env: { NODE_ENV: 'development' } }
 if (!globalThis.setTimeout) globalThis.setTimeout = globalThis.os ? globalThis.os.setTimeout : 
@@ -45,7 +46,6 @@ class Elm {
         c._parent = this._id;
         this.children.push(c);
         // console.log(JSON.stringify(c));
-
         sendMessage('onAppend', JSON.stringify({ element: this._id, child: c._id }));
     }
 
@@ -74,6 +74,25 @@ class Elm {
         erase(this.attributes[a]);
         // sendMessage('onUpdate', JSON.stringify({ element: this._id }));
     }
+
+        // this is not actually a document function
+    setStyles(styles) {
+        Object.keys(styles).forEach(name => {
+            console.log(name);
+          const rawValue = styles[name];
+          const isEmpty = rawValue === null || typeof rawValue === 'boolean' || rawValue === '';
+      
+        //   // Unset the style to its default values using an empty string
+          if (isEmpty) this.style[name] = '';
+          else {
+            const value =
+              typeof rawValue === 'number' && !isUnitlessProperty(name) ? `${rawValue}px` : rawValue;
+            this.style[name] = value;
+          }
+        });
+        console.log('style!!!');
+        sendMessage('onUpdate', JSON.stringify({ element: this._id, style : this.style }));
+      }
 }
 
 class Doc extends Elm {

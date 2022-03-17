@@ -1,7 +1,6 @@
 import React from 'react';
 import Reconciler from 'react-reconciler';
 import uuid from 'tiny-uuid'
-import { isUnitlessProperty } from './css';
 
 const getCircularReplacer = () => {
   const seen = new WeakSet();
@@ -12,22 +11,6 @@ const getCircularReplacer = () => {
     return value;
   };
 };
-
-function setStyles(domElement, styles) {
-  Object.keys(styles).forEach(name => {
-    const rawValue = styles[name];
-    const isEmpty = rawValue === null || typeof rawValue === 'boolean' || rawValue === '';
-
-    // Unset the style to its default values using an empty string
-    if (isEmpty) domElement.style[name] = '';
-    else {
-      const value =
-        typeof rawValue === 'number' && !isUnitlessProperty(name) ? `${rawValue}px` : rawValue;
-
-      domElement.style[name] = value;
-    }
-  });
-}
 
 function shallowDiff(oldObj, newObj) {
   // Return a diff between the new and the old object
@@ -74,7 +57,7 @@ const hostConfig = {
       const propValue = props[propName];
 
       if (propName === 'style') {
-        setStyles(domElement, propValue);
+        domElement.setStyles(propValue);
       } else if (propName === 'children') {
         // Set the textContent only for literal string or number children, whereas
         // nodes will be appended in `appendChild`

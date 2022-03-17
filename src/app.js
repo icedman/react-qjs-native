@@ -10,32 +10,34 @@ class App extends Component {
   constructor () {
     super()
     this.state = {
-      hello: 'Hello React!',
-      p: 0
+      greet: 'Hello React!',
+      number: 0
     }
   }
 
   render () {
-    const { hello, p } = this.state
+    const { greet, number } = this.state
     // console.log(JSON.stringify(this.state))
     return (
-      <Fragment>
-        <Fragment key='1'>
-        greet:{hello}
-        </Fragment>
-        <Fragment key='2'>
-        p:{p} 
-        </Fragment>
-        <View key='4'><Text key='3'>xxx</Text></View>
-      </Fragment>
+      <View style={{flexDirection: 'column'}}>
+        <View style={{flexDirection: 'row'}}>
+          <Fragment>
+          greet:{greet}
+          </Fragment>
+          <Fragment>
+          number:{number} 
+          </Fragment>
+        </View>
+        <Text>Some other text</Text>
+      </View>
     )
   }
 
   componentDidMount () {
     console.log('APP DID MOUNT!')
     // XXX: Emulate event driven update
-    setTimeout(() => this.setState({ hello: 'Hello Pi!', p: 42 }), 2000)
-    setTimeout(() => this.setState({ hello: '', p: -1 }), 4000)
+    setTimeout(() => this.setState({ greet: 'Hello Flutter!', number: 1 }), 2000)
+    setTimeout(() => this.setState({ greet: 'Goodbye!', number: 2 }), 3000)
   }
 }
 
