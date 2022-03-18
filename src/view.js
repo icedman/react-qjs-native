@@ -6,6 +6,7 @@ export default class View extends Component {
   render() {
     return (
       <view
+        onClick={this.props.onClick}
         style={{
           display: 'flex',
           flexDirection: 'column',

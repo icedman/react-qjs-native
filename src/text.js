@@ -4,6 +4,6 @@ const { Component, Fragment } = React
 
 export default class Text extends Component {
   render() {
-    return <text>{this.props.children}</text>;
+    return <text style={{...this.props.style}} onClick={this.props.onClick}>{this.props.children}</text>;
   }
 }

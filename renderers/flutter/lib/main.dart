@@ -7,7 +7,7 @@ import 'package:flutter_js/flutter_js.dart';
 
 import './element.dart' as React;
 
-React.ElementRegistry registry = React.ElementRegistry.instance();
+React.Registry registry = React.Registry.instance();
 
 void main() {
   runApp(const MyApp());
@@ -78,6 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
       registry.updateElement(args['element'], jsonEncode(args));
     });
 
+    React.Registry.instance().js = flutterJs;
     runScript('../../dist/app.js');
   }
 

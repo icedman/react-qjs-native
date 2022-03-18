@@ -32,6 +32,16 @@ const _getCircularReplacer = () => {
   };
 };
 
+const registry = {};
+
+globalThis.onEvent = (id, type) => {
+    var elm = registry[id];
+    if (!elm) return;
+    var func = elm.listeners[type];
+    if (!func) return;
+    func();
+}
+
 class Elm {
     constructor(t) {
         this._id = uuid();
@@ -39,7 +49,10 @@ class Elm {
         this.children = [];
         this.attributes = {};
         this.style = {};
+        this.listeners = {};
         // console.log(JSON.stringify(this));
+
+        registry[this._id] = this;
     }
 
     appendChild(c) {
@@ -75,6 +88,11 @@ class Elm {
         // sendMessage('onUpdate', JSON.stringify({ element: this._id }));
     }
 
+    addEventListener(eventName, callback) {
+        this.listeners[eventName] = callback;
+        sendMessage('onUpdate', JSON.stringify({ element: this._id, events: { [eventName] : 'function' } }));
+    }
+
         // this is not actually a document function
     setStyles(styles) {
         Object.keys(styles).forEach(name => {
@@ -90,7 +108,6 @@ class Elm {
             this.style[name] = value;
           }
         });
-        console.log('style!!!');
         sendMessage('onUpdate', JSON.stringify({ element: this._id, style : this.style }));
       }
 }

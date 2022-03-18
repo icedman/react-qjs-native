@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_js/flutter_js.dart';
 
 class Element {
   String id = '';
@@ -16,11 +17,12 @@ class Element {
   }
 }
 
-ElementRegistry gRegistry = ElementRegistry();
+Registry gRegistry = Registry();
 
-class ElementRegistry {
+class Registry {
+  JavascriptRuntime? js;
 
-  static ElementRegistry instance() {
+  static Registry instance() {
     return gRegistry;
   }
 
@@ -98,7 +100,6 @@ class ElementRegistry {
 }
 
 class StateProvider extends ChangeNotifier {
-  String state = ''; // json...
   var json = jsonDecode('{}');
 
   void setState(String s) {
@@ -110,8 +111,17 @@ class StateProvider extends ChangeNotifier {
   }
 }
 
+class ElementUtils {
+  List<Widget> wrapExpanded(List<Widget> widgets) {
+    List<Widget> res = [];
+    for (final c in widgets) {
+      res.add(Expanded(child: c));
+    }
+    return res;
+  }
+}
 
-class TextElement extends StatelessWidget {
+class TextElement extends StatelessWidget with ElementUtils {
   TextElement({Element? this.element, String this.textContent = ''});
   Element? element;
   String textContent = '';
@@ -123,8 +133,11 @@ class TextElement extends StatelessWidget {
   }
 }
 
-class ViewElement extends StatelessWidget {
-  ViewElement({Element? this.element, String? this.textContent = '', List<Widget>? this.children});
+class ViewElement extends StatelessWidget with ElementUtils {
+  ViewElement(
+      {Element? this.element,
+      String? this.textContent = '',
+      List<Widget>? this.children});
   Element? element;
   String? textContent = '';
   List<Widget>? children;
@@ -132,7 +145,7 @@ class ViewElement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     StateProvider state = Provider.of<StateProvider>(context);
-    
+
     String flexDirection = 'column';
     if (state.json['style'] != null) {
       final attribs = state.json['style'];
@@ -145,11 +158,12 @@ class ViewElement extends StatelessWidget {
     if (textContent != null) {
       ct.add(Text(textContent ?? ''));
     }
-    
+
     if (flexDirection == 'column') {
-      return Column(children: [...ct, ...this.children ?? []]);
+      return Column(
+          children: wrapExpanded([...ct, ...this.children ?? []]));
     } else {
-      return Row(children: [...ct, ...this.children ?? []]);
+      return Row(children: wrapExpanded([...ct, ...this.children ?? []]));
     }
   }
 }
@@ -161,17 +175,19 @@ class ElementWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     StateProvider state = Provider.of<StateProvider>(context);
-    // print('build ${element?.id}');
-    List<Widget> cc = 
-    (element?.children ?? [])
+    
+    // extract children
+    List<Widget> cc = (element?.children ?? [])
         .map(
           (c) => MultiProvider(providers: [
             ChangeNotifierProvider(
-                create: (context) => ElementRegistry.instance().element(c).state),
-          ], child: ElementRegistry.instance().element(c).builder(context)),
+                create: (context) =>
+                    Registry.instance().element(c).state),
+          ], child: Registry.instance().element(c).builder(context)),
         )
         .toList();
 
+    // extract attributes
     String? textContent;
     if (state.json['attributes'] != null) {
       final attribs = state.json['attributes'];
@@ -180,10 +196,43 @@ class ElementWidget extends StatelessWidget {
       }
     }
 
-    if (cc.length == 0 && textContent != null) {
-      return TextElement(element: element, textContent: textContent);
+    // extract styles
+
+    // extract events
+    bool hasEvents = false;
+    if (state.json['events'] != null) {
+      final events = state.json['events'];
+      if (events['onClick'] != null) {
+        hasEvents = true;
+      }
     }
-  
-    return ViewElement(element: element, children: cc, textContent: textContent);
+
+    Widget? child;
+    if (cc.length == 0 && textContent != null) {
+      child = TextElement(element: element, textContent: textContent);
+    }
+
+    if (child == null) {
+      child = ViewElement(
+        element: element, children: cc, textContent: textContent);
+    }
+
+    if (hasEvents) {
+      return GestureDetector(
+        onTapDown: (details) {
+          print('tap! ${details}');
+
+          try {
+      final script = 'onEvent("${element?.id}", "onClick")';
+      JsEvalResult? jsResult = Registry.instance().js?.evaluate(script);
+    } catch (err, msg) {
+      print(err);
+    }
+
+        },
+        child: child
+      );
+    }
+    return child;
   }
 }

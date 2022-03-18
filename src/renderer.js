@@ -29,8 +29,7 @@ function isUppercase(letter) {
 }
 
 function isEventName(propName) {
-  // return propName.startsWith('on') && window.hasOwnProperty(propName.toLowerCase());
-  return false;
+  return propName.startsWith('on');
 }
 
 const hostConfig = {
@@ -68,8 +67,7 @@ const hostConfig = {
       } else if (propName === 'className') {
         domElement.setAttribute('class', propValue);
       } else if (isEventName(propName)) {
-        // const eventName = propName.toLowerCase().replace('on', '');
-        // domElement.addEventListener(eventName, propValue);
+        domElement.addEventListener(propName, propValue);
       } else {
         domElement.setAttribute(propName, propValue);
       }

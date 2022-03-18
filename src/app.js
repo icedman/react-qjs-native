@@ -15,9 +15,11 @@ class App extends Component {
     }
   }
 
+
   render () {
     const { greet, number } = this.state
     // console.log(JSON.stringify(this.state))
+
     return (
       <View style={{flexDirection: 'column'}}>
         <View style={{flexDirection: 'row'}}>
@@ -28,7 +30,10 @@ class App extends Component {
           number:{number} 
           </Fragment>
         </View>
-        <Text>Some other text</Text>
+        <Text style={{color:'red'}} 
+          onClick={()=>{
+            this.setState({ greet: 'Hello from Flutter!', number: this.state.number + 1 });
+          }}>Some other text</Text>
       </View>
     )
   }
