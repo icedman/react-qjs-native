@@ -1,6 +1,6 @@
 /**
  * CSS properties which accept numbers but are not in units of "px".
- * 
+ *
  * @NOTE: Taken from React source code
  * @url{https://github.com/facebook/react/blob/37e4329bc81def4695211d6e3795a654ef4d84f5/packages/react-dom/src/shared/CSSProperty.js}
  */

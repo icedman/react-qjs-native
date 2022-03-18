@@ -1,6 +1,6 @@
-import React from 'react'
+import React from "react";
 
-const { Component, Fragment } = React
+const { Component, Fragment } = React;
 
 export default class View extends Component {
   render() {
@@ -8,9 +8,9 @@ export default class View extends Component {
       <view
         onClick={this.props.onClick}
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          ...this.props.style
+          display: "flex",
+          flexDirection: "column",
+          ...this.props.style,
         }}
       >
         {this.props.children}

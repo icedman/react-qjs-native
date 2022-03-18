@@ -1,25 +1,25 @@
-import React from 'react';
-import Reconciler from 'react-reconciler';
-import uuid from 'tiny-uuid'
+import React from "react";
+import Reconciler from "react-reconciler";
+import uuid from "tiny-uuid";
 
-const getCircularReplacer = () => {
+function getCircularReplacer() {
   const seen = new WeakSet();
   return (key, value) => {
-    if (key === 'children') {
-      return value.map(c => c._id);
+    if (key === "children") {
+      return value.map((c) => c._id);
     }
     return value;
   };
-};
+}
+
+// based on react-tiny-dom
 
 function shallowDiff(oldObj, newObj) {
-  // Return a diff between the new and the old object
-  // const uniqueProps = new Set([...Object.keys(oldObj), ...Object.keys(newObj)]);
-  const uniqueProps = new Set(); // new Set([...Object.keys(oldObj), ...Object.keys(newObj));
-  Object.keys(oldObj).forEach(k => uniqueProps.add(k));
-  Object.keys(newObj).forEach(k => uniqueProps.add(k));
+  const uniqueProps = new Set();
+  Object.keys(oldObj).forEach((k) => uniqueProps.add(k));
+  Object.keys(newObj).forEach((k) => uniqueProps.add(k));
   const changedProps = Array.from(uniqueProps).filter(
-    propName => oldObj[propName] !== newObj[propName]
+    (propName) => oldObj[propName] !== newObj[propName]
   );
   return changedProps;
 }
@@ -29,7 +29,7 @@ function isUppercase(letter) {
 }
 
 function isEventName(propName) {
-  return propName.startsWith('on');
+  return propName.startsWith("on");
 }
 
 const hostConfig = {
@@ -39,7 +39,13 @@ const hostConfig = {
   },
 
   // Create the DOMElement, but attributes are set in `finalizeInitialChildren`
-  createInstance(type, props, rootContainerInstance, hostContext, internalInstanceHandle) {
+  createInstance(
+    type,
+    props,
+    rootContainerInstance,
+    hostContext,
+    internalInstanceHandle
+  ) {
     return document.createElement(type);
   },
 
@@ -52,21 +58,21 @@ const hostConfig = {
   // it needs focus, which will be eventually set in `commitMount`
   finalizeInitialChildren(domElement, type, props) {
     // Set the prop to the domElement
-    Object.keys(props).forEach(propName => {
+    Object.keys(props).forEach((propName) => {
       const propValue = props[propName];
 
-      if (propName === 'style') {
+      if (propName === "style") {
         domElement.setStyles(propValue);
-      } else if (propName === 'children') {
+      } else if (propName === "children") {
         // Set the textContent only for literal string or number children, whereas
         // nodes will be appended in `appendChild`
-        if (typeof propValue === 'string' || typeof propValue === 'number') {
+        if (typeof propValue === "string" || typeof propValue === "number") {
           domElement.textContent = propValue;
-          domElement.setAttribute('textContent', propValue);
+          domElement.setAttribute("textContent", propValue);
         }
-      } else if (propName === 'className') {
-        domElement.setAttribute('class', propValue);
-      } else if (isEventName(propName)) {
+      } else if (propName === "className") {
+        domElement.setAttribute("class", propValue);
+      } else if (isEventName(propName) && typeof propValue === "function") {
         domElement.addEventListener(propName, propValue);
       } else {
         domElement.setAttribute(propName, propValue);
@@ -98,9 +104,9 @@ const hostConfig = {
 
   shouldSetTextContent(type, props) {
     return (
-      type === 'textarea' ||
-      typeof props.children === 'string' ||
-      typeof props.children === 'number'
+      type === "textarea" ||
+      typeof props.children === "string" ||
+      typeof props.children === "number"
     );
   },
 
@@ -137,9 +143,14 @@ const hostConfig = {
     parentInstance.insertBefore(child, beforeChild);
   },
 
-  commitUpdate(domElement, updatePayload, type, oldProps, newProps, internalInstanceHandle) {
-
-  },
+  commitUpdate(
+    domElement,
+    updatePayload,
+    type,
+    oldProps,
+    newProps,
+    internalInstanceHandle
+  ) {},
 
   commitMount(domElement, type, newProps, internalInstanceHandle) {
     domElement.focus();
@@ -147,19 +158,16 @@ const hostConfig = {
 
   commitTextUpdate(domElement, oldText, newText) {
     // textInstance.nodeValue = newText;
-    domElement.setAttribute('textContent', newText);
+    domElement.setAttribute("textContent", newText);
   },
 
   resetTextContent(domElement) {
-    domElement.textContent = '';
-    domElement.setAttribute('textContent', '');
+    domElement.textContent = "";
+    domElement.setAttribute("textContent", "");
   },
 };
 
-const TinyDOMRenderer = Reconciler(
-  // debugMethods(hostConfig, ['now', 'getChildHostContext', 'shouldSetTextContent'])
-  hostConfig
-);
+const TinyDOMRenderer = Reconciler(hostConfig);
 
 export default ReactTinyDOM = {
   render(element, domContainer, callback) {

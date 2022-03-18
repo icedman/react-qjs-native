@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_js/flutter_js.dart';
 
+import './components/component.dart';
+import './components/text.dart';
+import './components/view.dart';
+import './components/textinput.dart';
+
 class Element {
   String id = '';
   String type = '';
@@ -17,13 +22,13 @@ class Element {
   }
 }
 
-Registry gRegistry = Registry();
+Registry theRegistry = Registry();
 
 class Registry {
   JavascriptRuntime? js;
 
   static Registry instance() {
-    return gRegistry;
+    return theRegistry;
   }
 
   Map<String, Element> elements = <String, Element>{};
@@ -99,75 +104,6 @@ class Registry {
   }
 }
 
-class StateProvider extends ChangeNotifier {
-  var json = jsonDecode('{}');
-
-  void setState(String s) {
-    var newState = jsonDecode(s); // merge
-    for (var k in newState.keys) {
-      json[k] = newState[k];
-    }
-    notifyListeners();
-  }
-}
-
-class ElementUtils {
-  List<Widget> wrapExpanded(List<Widget> widgets) {
-    List<Widget> res = [];
-    for (final c in widgets) {
-      res.add(Expanded(child: c));
-    }
-    return res;
-  }
-}
-
-class TextElement extends StatelessWidget with ElementUtils {
-  TextElement({Element? this.element, String this.textContent = ''});
-  Element? element;
-  String textContent = '';
-
-  @override
-  Widget build(BuildContext context) {
-    StateProvider state = Provider.of<StateProvider>(context);
-    return Text(textContent);
-  }
-}
-
-class ViewElement extends StatelessWidget with ElementUtils {
-  ViewElement(
-      {Element? this.element,
-      String? this.textContent = '',
-      List<Widget>? this.children});
-  Element? element;
-  String? textContent = '';
-  List<Widget>? children;
-
-  @override
-  Widget build(BuildContext context) {
-    StateProvider state = Provider.of<StateProvider>(context);
-
-    String flexDirection = 'column';
-    if (state.json['style'] != null) {
-      final attribs = state.json['style'];
-      if (attribs['flexDirection'] != null) {
-        flexDirection = attribs['flexDirection']!;
-      }
-    }
-
-    List<Widget> ct = [];
-    if (textContent != null) {
-      ct.add(Text(textContent ?? ''));
-    }
-
-    if (flexDirection == 'column') {
-      return Column(
-          children: wrapExpanded([...ct, ...this.children ?? []]));
-    } else {
-      return Row(children: wrapExpanded([...ct, ...this.children ?? []]));
-    }
-  }
-}
-
 class ElementWidget extends StatelessWidget {
   ElementWidget({Element? this.element});
   Element? element;
@@ -175,14 +111,13 @@ class ElementWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     StateProvider state = Provider.of<StateProvider>(context);
-    
+
     // extract children
     List<Widget> cc = (element?.children ?? [])
         .map(
           (c) => MultiProvider(providers: [
             ChangeNotifierProvider(
-                create: (context) =>
-                    Registry.instance().element(c).state),
+                create: (context) => Registry.instance().element(c).state),
           ], child: Registry.instance().element(c).builder(context)),
         )
         .toList();
@@ -208,30 +143,34 @@ class ElementWidget extends StatelessWidget {
     }
 
     Widget? child;
-    if (cc.length == 0 && textContent != null) {
+
+    if ((element?.type ?? '') == 'textinput') {
+      child =
+          TextInputElement(element: element, textContent: textContent ?? '');
+    }
+
+    if (child == null && cc.length == 0 && textContent != null) {
       child = TextElement(element: element, textContent: textContent);
     }
 
     if (child == null) {
-      child = ViewElement(
-        element: element, children: cc, textContent: textContent);
+      child =
+          ViewElement(element: element, children: cc, textContent: textContent);
     }
 
     if (hasEvents) {
       return GestureDetector(
-        onTapDown: (details) {
-          print('tap! ${details}');
+          onTapDown: (details) {
+            print('tap! ${details}');
 
-          try {
-      final script = 'onEvent("${element?.id}", "onClick")';
-      JsEvalResult? jsResult = Registry.instance().js?.evaluate(script);
-    } catch (err, msg) {
-      print(err);
-    }
-
-        },
-        child: child
-      );
+            try {
+              final script = 'onEvent("${element?.id}", "onClick")';
+              JsEvalResult? jsResult = Registry.instance().js?.evaluate(script);
+            } catch (err, msg) {
+              print(err);
+            }
+          },
+          child: child);
     }
     return child;
   }
