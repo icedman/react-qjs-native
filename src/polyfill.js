@@ -59,7 +59,6 @@ class Elm {
   appendChild(c) {
     c._parent = this._id;
     this.children.push(c);
-    // console.log(JSON.stringify(c));
     sendMessage(
       "onAppend",
       JSON.stringify({ element: this._id, child: c._id })
@@ -107,27 +106,25 @@ class Elm {
     );
   }
 
-  // this is not actually a document function
-  setStyles(styles) {
+  // these are not actually a document function
+  toStyleObject(styles) {
+    let res = {};
     Object.keys(styles).forEach((name) => {
-      console.log(name);
+      // console.log(name);
       const rawValue = styles[name];
       const isEmpty =
         rawValue === null || typeof rawValue === "boolean" || rawValue === "";
 
-      if (isEmpty) this.style[name] = "";
+      if (isEmpty) res[name] = "";
       else {
         const value =
           typeof rawValue === "number" && !isUnitlessProperty(name)
             ? `${rawValue}px`
             : rawValue;
-        this.style[name] = value;
+        res[name] = value;
       }
     });
-    sendMessage(
-      "onUpdate",
-      JSON.stringify({ element: this._id, style: this.style })
-    );
+    return res;
   }
 }
 
@@ -137,8 +134,15 @@ class Doc extends Elm {
     sendMessage("onCreate", JSON.stringify(this, getCircularReplacer()));
   }
 
-  createElement(t) {
+  createElement(t,p) {
     let res = new Elm(t);
+    Object.keys(p).forEach(k => {
+      if (typeof(p[k]) !== 'object') {
+        res.attributes[k] = p[k];
+      } else if (k == 'style') {
+        res.attributes['style'] = this.toStyleObject(p[k]);
+      }
+    });
     sendMessage("onCreate", JSON.stringify(res, getCircularReplacer()));
     return res;
   }

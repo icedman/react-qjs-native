@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import './component.dart';
 import '../element.dart' as React;
 
-class TextInputElement extends StatefulWidget {
+class TextInputElement extends StatefulWidget with Component {
   TextInputElement({React.Element? this.element, String this.textContent = ''});
   React.Element? element;
   String textContent = '';
@@ -23,7 +23,9 @@ class _TextInputElement extends State<TextInputElement> with Component {
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController();
+    React.Element elm = widget.element ?? React.Element();
+    String value = elm.state.attributes()['value'] ?? '';
+    controller = TextEditingController(text: value);
   }
 
   @override

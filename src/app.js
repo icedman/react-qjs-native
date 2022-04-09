@@ -1,6 +1,6 @@
 import React from "react";
 import uuid from "tiny-uuid";
-import { Text, View, TextInput } from "./components";
+import { Text, View, TextInput, Button } from "./components";
 
 const { Component, Fragment } = React;
 
@@ -10,7 +10,7 @@ class App extends Component {
     this.state = {
       greet: "Hello React!",
       number: 0,
-      other: "Some other text"
+      other: "Some other text",
     };
   }
 
@@ -25,13 +25,19 @@ class App extends Component {
           <Fragment>number:{number}</Fragment>
         </View>
         <TextInput
-          value='xxx'
+          value="xxx"
+          onChangeText={(value) => {
+            this.setState({ other: value });
+          }}
+        />
+        <TextInput
+          value="yyy"
           onChangeText={(value) => {
             this.setState({ other: value });
           }}
         />
         <Text
-          style={{ color: "red" }}
+          style={{ color: "#ff0000" }}
           onClick={() => {
             this.setState({
               greet: "Hello from Flutter!",
@@ -41,6 +47,17 @@ class App extends Component {
         >
           {other}
         </Text>
+        <Button 
+          style={{ color: "#ff00ff" }}
+          onClick={() => {
+            // this.setState({
+            //   greet: "Hello from Flutter!",
+            //   number: this.state.number + 1,
+            // });
+            console.log('tap!!!');
+          }}>
+            Hello
+        </Button>
       </View>
     );
   }

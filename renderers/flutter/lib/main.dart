@@ -40,8 +40,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late JavascriptRuntime flutterJs;
 
-  int _counter = 10;
-
   void runScript(path) async {
     File f = await File(path);
     try {
@@ -59,37 +57,30 @@ class _MyHomePageState extends State<MyHomePage> {
       print(args);
     });
     flutterJs.onMessage('onCreate', (dynamic args) {
-      print('create... ${args['_id']}');
+      // print('create... ${args['_id']}');
+      // if (args['type'] == 'textinput') {
+      //   print(args);
+      // }
       registry.createElement('', '', state: jsonEncode(args));
       setState(() {}); // ping
     });
     flutterJs.onMessage('onAppend', (dynamic args) {
-      print('append...');
-      print(args);
+      // print('append...');
+      // print(args);
       registry.appendChild(args['element'], args['child']);
     });
     flutterJs.onMessage('onRemove', (dynamic args) {
-      print('remove...');
+      // print('remove...');
       //  print(args);
     });
     flutterJs.onMessage('onUpdate', (dynamic args) {
-      print('update...');
-      print(args);
+      // print('update...');
+      // print(args);
       registry.updateElement(args['element'], jsonEncode(args));
     });
 
     React.Registry.instance().js = flutterJs;
     runScript('../../dist/app.js');
-  }
-
-  void _incrementCounter() {
-    // registry.createElement('elm-$_counter', 'text');
-    // registry.appendChild('elm-1', 'elm-$_counter');
-    // registry.updateElement('elm-1', '{ "color": "yellow" }');
-
-    setState(() {
-      _counter++;
-    });
   }
 
   @override
@@ -113,11 +104,6 @@ class _MyHomePageState extends State<MyHomePage> {
       body: MultiProvider(providers: [
         ChangeNotifierProvider(create: (context) => root.state),
       ], child: root.builder(context)),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }

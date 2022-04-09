@@ -22,12 +22,8 @@ class ViewElement extends StatelessWidget with Component {
     StateProvider state = Provider.of<StateProvider>(context);
 
     String flexDirection = 'column';
-    if (state.json['style'] != null) {
-      final attribs = state.json['style'];
-      if (attribs['flexDirection'] != null) {
-        flexDirection = attribs['flexDirection']!;
-      }
-    }
+    dynamic style = state.style();
+    flexDirection = style['flexDirection'] ?? flexDirection;
 
     List<Widget> ct = [];
     if (textContent != null) {
@@ -35,9 +31,9 @@ class ViewElement extends StatelessWidget with Component {
     }
 
     if (flexDirection == 'column') {
-      return Column(children: wrapExpanded([...ct, ...this.children ?? []]));
+      return decorate(Column(children: expandEach([...ct, ...this.children ?? []])), style);
     } else {
-      return Row(children: wrapExpanded([...ct, ...this.children ?? []]));
+      return decorate(Row(children: expandEach([...ct, ...this.children ?? []])), style);
     }
   }
 }

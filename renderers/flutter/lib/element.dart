@@ -9,8 +9,9 @@ import './components/component.dart';
 import './components/text.dart';
 import './components/view.dart';
 import './components/textinput.dart';
+import './components/button.dart';
 
-class Element {
+class Element extends Object {
   String id = '';
   String type = '';
   String parent = '';
@@ -19,6 +20,11 @@ class Element {
 
   Widget builder(BuildContext context) {
     return ElementWidget(element: this);
+  }
+
+  @override
+  String toString() {
+    return 'Element: ${state.json}';
   }
 }
 
@@ -124,12 +130,7 @@ class ElementWidget extends StatelessWidget {
 
     // extract attributes
     String? textContent;
-    if (state.json['attributes'] != null) {
-      final attribs = state.json['attributes'];
-      if (attribs['textContent'] != null) {
-        textContent = attribs['textContent']!;
-      }
-    }
+    textContent = state.attributes()['textContent'];
 
     // extract styles
 
@@ -146,13 +147,18 @@ class ElementWidget extends StatelessWidget {
 
     if ((element?.type ?? '') == 'textinput') {
       child =
-          TextInputElement(element: element, textContent: textContent ?? '');
+          TextInputElement(element: element);
+    }
+    if ((element?.type ?? '') == 'button') {
+      child =
+          ButtonElement(element: element, children: cc, textContent: textContent);
     }
 
     if (child == null && cc.length == 0 && textContent != null) {
       child = TextElement(element: element, textContent: textContent);
     }
 
+    // fallback to View
     if (child == null) {
       child =
           ViewElement(element: element, children: cc, textContent: textContent);
@@ -161,8 +167,6 @@ class ElementWidget extends StatelessWidget {
     if (hasEvents) {
       return GestureDetector(
           onTapDown: (details) {
-            print('tap! ${details}');
-
             try {
               final script = 'onEvent("${element?.id}", "onClick")';
               JsEvalResult? jsResult = Registry.instance().js?.evaluate(script);

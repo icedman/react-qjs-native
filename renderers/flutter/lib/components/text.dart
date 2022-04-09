@@ -16,6 +16,7 @@ class TextElement extends StatelessWidget with Component {
   @override
   Widget build(BuildContext context) {
     StateProvider state = Provider.of<StateProvider>(context);
-    return Text(textContent);
+    dynamic style = state.style();
+    return Text(textContent, style: textStyle(style));
   }
 }

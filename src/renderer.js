@@ -46,7 +46,7 @@ const hostConfig = {
     hostContext,
     internalInstanceHandle
   ) {
-    return document.createElement(type);
+    return document.createElement(type, props);
   },
 
   createTextInstance(text, rootContainerInstance, internalInstanceHandle) {
@@ -62,7 +62,7 @@ const hostConfig = {
       const propValue = props[propName];
 
       if (propName === "style") {
-        domElement.setStyles(propValue);
+        domElement.setAttribute("style", domElement.toStyleObject(propValue));
       } else if (propName === "children") {
         // Set the textContent only for literal string or number children, whereas
         // nodes will be appended in `appendChild`
