@@ -12,6 +12,7 @@ import './components/text.dart';
 import './components/textinput.dart';
 import './components/button.dart';
 import './components/flatlist.dart';
+import './components/icon.dart';
 
 class Element extends Object {
   String id = '';
@@ -170,6 +171,10 @@ class ElementWidget extends StatelessWidget with Component {
     if ((element?.type ?? '') == 'flatlist') {
       child =
           FlatList(element: element, children: cc, textContent: textContent);
+    }
+    if ((element?.type ?? '') == 'icon') {
+      child =
+          IconElement(element: element);
     }
 
     // fallback to View

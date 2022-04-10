@@ -17,7 +17,22 @@ class Component {
     if (style['color'] != null) {
       color = hexToColor(style['color'] ?? '#000000');
     }
-    return TextStyle(color: color);
+    TextDecoration decor = TextDecoration.none;
+    if (style['strikethrough'] == "true") {
+      decor = TextDecoration.lineThrough;
+    }
+    if (style['underline'] == "true") {
+      decor = TextDecoration.underline;
+    }
+    FontWeight fontWeight = FontWeight.normal;
+    if (style['bold'] == "true") {
+      fontWeight = FontWeight.bold;
+    }
+    FontStyle fontStyle = FontStyle.normal;
+    if (style['italic'] == "true") {
+      fontStyle = FontStyle.italic;
+    }
+    return TextStyle(fontSize: 18, color: color, decoration: decor, fontWeight: fontWeight, fontStyle: fontStyle);
   }
 
   BoxDecoration boxStyle(dynamic style) {
@@ -50,8 +65,18 @@ class Component {
       }
       return Container(width: int.parse(width).toDouble(), child: widget);
     }
+    String align = style['align'] ?? '';
+    Alignment alignment = Alignment.center;
+    switch(align) {
+      case 'left':
+        alignment: Alignment.centerLeft;
+        break;
+      case 'right':
+        alignment: Alignment.centerRight;
+        break;
+    }
     int flex = style['flex'] ?? 1;
-    return Expanded(flex: flex, child: Align(alignment: Alignment.center, child: widget));
+    return Expanded(flex: flex, child: Align(alignment: alignment, child: widget));
   }
 
   Widget decorate(Widget widget, dynamic style) {
@@ -93,6 +118,9 @@ class StateProvider extends ChangeNotifier {
   @override
   void notifyListeners() {
     if (proxy != null) {
+      proxy?._json = raw();
+      proxy?._attributes = attributes();
+      proxy?._style = style();
       proxy?.notifyListeners();
       return;
     }

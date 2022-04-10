@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_js/flutter_js.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 import './components/component.dart';
 import './element.dart' as React;
@@ -41,6 +42,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late JavascriptRuntime flutterJs;
 
+  void runScriptAsset(path) async {
+    final contents = await rootBundle.loadString(path);
+    try {
+      JsEvalResult jsResult = flutterJs.evaluate(contents);
+    } catch (err, msg) {}
+  }
+
   void runScript(path) async {
     File f = await File(path);
     try {
@@ -72,7 +80,9 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     React.Registry.instance().js = flutterJs;
-    runScript('../../dist/app.js');
+
+    runScriptAsset('scripts/app.js');
+    // runScript('../../dist/app.js');
   }
 
   @override

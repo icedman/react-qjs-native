@@ -97,7 +97,7 @@ class Elm {
 
   addEventListener(eventName, callback) {
     this.listeners[eventName] = callback;
-    console.log("listen: " + this.key + ", " + eventName);
+    // console.log("listen: " + this.key + ", " + eventName);
     sendMessage(
       "onUpdate",
       JSON.stringify({ element: this.key, events: { [eventName]: "function" } })

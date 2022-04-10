@@ -2,6 +2,9 @@ import React from "react";
 import Reconciler from "react-reconciler";
 import uuid from "tiny-uuid";
 
+// based on react-tiny-dom
+// https://github.com/jiayihu/react-tiny-dom
+
 function getCircularReplacer() {
   const seen = new WeakSet();
   return (key, value) => {
@@ -11,8 +14,6 @@ function getCircularReplacer() {
     return value;
   };
 }
-
-// based on react-tiny-dom
 
 function shallowDiff(oldObj, newObj) {
   const uniqueProps = new Set();
@@ -150,14 +151,21 @@ const hostConfig = {
     oldProps,
     newProps,
     internalInstanceHandle
-  ) {},
+  ) {
+    Object.keys(newProps).forEach(k => {
+      if (k == 'style') {
+        domElement.setAttribute("style", domElement.toStyleObject(newProps[k]));
+      } else if (typeof(newProps[k]) !== 'object') {
+        domElement.setAttribute(k, newProps[k]);
+      }
+    });
+  },
 
   commitMount(domElement, type, newProps, internalInstanceHandle) {
-    domElement.focus();
+    // domElement.focus();
   },
 
   commitTextUpdate(domElement, oldText, newText) {
-    // textInstance.nodeValue = newText;
     domElement.setAttribute("textContent", newText);
   },
 

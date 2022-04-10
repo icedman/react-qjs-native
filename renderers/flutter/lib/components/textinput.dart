@@ -39,6 +39,7 @@ class _TextInputElement extends State<TextInputElement> with Component {
     StateProvider state = Provider.of<StateProvider>(context);
     return TextField(
         controller: controller,
+        autofocus: true,
         onSubmitted: (v) {
           try {
             final script =

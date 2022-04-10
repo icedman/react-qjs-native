@@ -7,6 +7,7 @@ import {
   Button,
   ScrollView,
   FlatList,
+  Icon
 } from "./components";
 
 const { Component, Fragment } = React;
