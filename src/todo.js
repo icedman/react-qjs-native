@@ -50,8 +50,12 @@ class App extends Component {
                 )}
                 {d.key == edit && (
                   <TextInput
+                    key="input"
                     value={d.name}
                     onChangeText={(value) => {
+                      if (typeof(value) === 'object') {
+                        value = value.target.value;
+                      }
                       this.state.todos[idx].name = value;
                       this.setState({
                         todos: this.state.todos,
@@ -97,9 +101,11 @@ class App extends Component {
         <Button
           style={{ color: "#ff00ff", height: 40 }}
           onClick={() => {
+            let key = uuid();
             this.setState({
+              edit: key,
               todos: [
-                { key: uuid(), name: "new todo", marked: false },
+                { key: key, name: "new todo", marked: false },
                 ...this.state.todos
               ]
             });

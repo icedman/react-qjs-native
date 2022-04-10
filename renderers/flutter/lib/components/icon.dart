@@ -10,10 +10,11 @@ import './view.dart';
 import '../element.dart' as React;
 
 class IconElement extends ViewElement {
-    IconElement(
+  IconElement(
       {React.Element? element,
       String? textContent = '',
-      List<Widget>? children}) : super(element: element, textContent: textContent, children: children);
+      List<Widget>? children})
+      : super(element: element, textContent: textContent, children: children);
 
   @override
   Widget build(BuildContext context) {
@@ -22,4 +23,3 @@ class IconElement extends ViewElement {
     return Icon(IconData(code, fontFamily: "MaterialIcons"));
   }
 }
-

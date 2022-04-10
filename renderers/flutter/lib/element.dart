@@ -120,21 +120,19 @@ class ElementWidget extends StatelessWidget with Component {
     StateProvider state = Provider.of<StateProvider>(context);
 
     // extract children
-    List<Widget> cc = (element?.children ?? [])
-        .map(
-          (c) {
-            Element? elm = Registry.instance().element(c);
-            return MultiProvider(providers: [
-            if (elm.state.style().keys.isNotEmpty) ...[
-              ChangeNotifierProvider(
-                  create: (context) => StyleProvider(elm.state.style())),
-            ],
+    List<Widget> cc = (element?.children ?? []).map(
+      (c) {
+        Element? elm = Registry.instance().element(c);
+        return MultiProvider(providers: [
+          if (elm.state.style().keys.isNotEmpty) ...[
             ChangeNotifierProvider(
-                create: (context) => StateProvider(state: elm.state))
-          ], child: elm.builder(context));
-          },
-        )
-        .toList();
+                create: (context) => StyleProvider(elm.state.style())),
+          ],
+          ChangeNotifierProvider(
+              create: (context) => StateProvider(state: elm.state))
+        ], child: elm.builder(context));
+      },
+    ).toList();
 
     // extract attributes
     String? textContent;
@@ -152,29 +150,26 @@ class ElementWidget extends StatelessWidget with Component {
     Widget? child;
 
     // factory
-    if ((element?.type ?? '') == 'textinput') {
-      child =
-          TextInputElement(element: element);
+    if ((element?.type ?? '') == 'input') {
+      child = TextInputElement(element: element);
     }
     if ((element?.type ?? '') == 'button') {
-      child =
-          ButtonElement(element: element, children: cc);
+      child = ButtonElement(element: element, children: cc);
     }
     if ((element?.type ?? '') == 'text') {
       child =
           TextElement(element: element, children: cc, textContent: textContent);
     }
     if ((element?.type ?? '') == 'scrollview') {
-      child =
-          ScrollElement(element: element, children: cc, textContent: textContent);
+      child = ScrollElement(
+          element: element, children: cc, textContent: textContent);
     }
     if ((element?.type ?? '') == 'flatlist') {
       child =
           FlatList(element: element, children: cc, textContent: textContent);
     }
     if ((element?.type ?? '') == 'icon') {
-      child =
-          IconElement(element: element);
+      child = IconElement(element: element);
     }
 
     // fallback to View

@@ -10,10 +10,11 @@ import './view.dart';
 import '../element.dart' as React;
 
 class TextElement extends ViewElement {
-    TextElement(
+  TextElement(
       {React.Element? element,
       String? textContent = '',
-      List<Widget>? children}) : super(element: element, textContent: textContent, children: children);
+      List<Widget>? children})
+      : super(element: element, textContent: textContent, children: children);
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +31,11 @@ class TextElement extends ViewElement {
     }
 
     if (flexDirection == 'column') {
-      return decorate(Column(children: ([...ct, ...children ?? []])), state.style());
+      return decorate(
+          Column(children: ([...ct, ...children ?? []])), state.style());
     } else {
-      return decorate(Row(children: ([...ct, ...children ?? []])), state.style());
+      return decorate(
+          Row(children: ([...ct, ...children ?? []])), state.style());
     }
   }
 }
-

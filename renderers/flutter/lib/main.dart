@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: MultiProvider(providers: [
         ChangeNotifierProvider(create: (context) => StyleProvider({})),
         ChangeNotifierProvider(create: (context) => root.state),
-      ], child: Column(children: [ root.builder(context) ])),
+      ], child: Column(children: [root.builder(context)])),
     );
   }
 }

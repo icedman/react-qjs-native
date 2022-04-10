@@ -42,8 +42,7 @@ class _TextInputElement extends State<TextInputElement> with Component {
         autofocus: true,
         onSubmitted: (v) {
           try {
-            final script =
-                'onEvent("${widget.element?.id}", "onSubmitEditing", "$v")';
+            final script = 'onEvent("${widget.element?.id}", "onSubmit", "$v")';
             JsEvalResult? jsResult =
                 React.Registry.instance().js?.evaluate(script);
           } catch (err, msg) {
@@ -52,8 +51,7 @@ class _TextInputElement extends State<TextInputElement> with Component {
         },
         onChanged: (v) {
           try {
-            final script =
-                'onEvent("${widget.element?.id}", "onChangeText", "$v")';
+            final script = 'onEvent("${widget.element?.id}", "onChange", "$v")';
             JsEvalResult? jsResult =
                 React.Registry.instance().js?.evaluate(script);
           } catch (err, msg) {

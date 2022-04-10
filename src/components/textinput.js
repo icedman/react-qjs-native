@@ -12,14 +12,14 @@ onChangeText
 export default class TextInput extends Component {
   render() {
     return (
-      <textinput
+      <input
         value={this.props.value}
         style={{ ...this.props.style }}
-        onChangeText={this.props.onChangeText}
-        onSubmitEditing={this.props.onSubmitEditing}
+        onChange={this.props.onChangeText}
+        onSubmit={this.props.onSubmitEditing}
       >
         {this.props.children}
-      </textinput>
+      </input>
     );
   }
 }

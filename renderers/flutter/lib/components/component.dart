@@ -32,7 +32,12 @@ class Component {
     if (style['italic'] == "true") {
       fontStyle = FontStyle.italic;
     }
-    return TextStyle(fontSize: 18, color: color, decoration: decor, fontWeight: fontWeight, fontStyle: fontStyle);
+    return TextStyle(
+        fontSize: 18,
+        color: color,
+        decoration: decor,
+        fontWeight: fontWeight,
+        fontStyle: fontStyle);
   }
 
   BoxDecoration boxStyle(dynamic style) {
@@ -67,16 +72,19 @@ class Component {
     }
     String align = style['align'] ?? '';
     Alignment alignment = Alignment.center;
-    switch(align) {
+    switch (align) {
       case 'left':
-        alignment: Alignment.centerLeft;
+        alignment:
+        Alignment.centerLeft;
         break;
       case 'right':
-        alignment: Alignment.centerRight;
+        alignment:
+        Alignment.centerRight;
         break;
     }
     int flex = style['flex'] ?? 1;
-    return Expanded(flex: flex, child: Align(alignment: alignment, child: widget));
+    return Expanded(
+        flex: flex, child: Align(alignment: alignment, child: widget));
   }
 
   Widget decorate(Widget widget, dynamic style) {
@@ -140,7 +148,7 @@ class StateProvider extends ChangeNotifier {
         dynamic obj = newState[k];
         for (var okey in obj.keys) {
           if (okey == 'style') {
-          dynamic style = obj[okey];
+            dynamic style = obj[okey];
             for (var skey in style.keys) {
               _style[skey] = style[skey];
             }

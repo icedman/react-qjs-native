@@ -10,8 +10,9 @@ import './view.dart';
 import '../element.dart' as React;
 
 class ButtonElement extends ViewElement {
-    ButtonElement(
+  ButtonElement(
       {React.Element? element,
       String? textContent = '',
-      List<Widget>? children}) : super(element: element, textContent: textContent, children: children);
+      List<Widget>? children})
+      : super(element: element, textContent: textContent, children: children);
 }

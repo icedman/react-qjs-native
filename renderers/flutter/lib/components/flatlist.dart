@@ -10,10 +10,11 @@ import './view.dart';
 import '../element.dart' as React;
 
 class FlatList extends ViewElement {
-    FlatList(
+  FlatList(
       {React.Element? element,
       String? textContent = '',
-      List<Widget>? children}) : super(element: element, textContent: textContent, children: children);
+      List<Widget>? children})
+      : super(element: element, textContent: textContent, children: children);
 
   @override
   Widget build(BuildContext context) {
