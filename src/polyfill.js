@@ -13,23 +13,15 @@ if (!globalThis.setTimeout)
         f();
       };
 if (!globalThis.console) globalThis.console = {};
-
-try {
-  globalThis.console.log = app.log;
-  globalThis.console.warn = app.log;
-  globalThis.console.error = app.log;
-  globalThis.sendMessage = (type, msg) => app.log(msg);
-} catch (err) {
-  globalThis.console.log = (msg) => sendMessage("log", JSON.stringify(msg));
-  globalThis.console.warn = (msg) => sendMessage("log", JSON.stringify(msg));
-  globalThis.console.error = (msg) => sendMessage("log", JSON.stringify(msg));
-}
+globalThis.console.log = (msg) => sendMessage("log", JSON.stringify(msg));
+globalThis.console.warn = (msg) => sendMessage("log", JSON.stringify(msg));
+globalThis.console.error = (msg) => sendMessage("log", JSON.stringify(msg));
 
 function getCircularReplacer() {
   const seen = new WeakSet();
   return (key, value) => {
     if (key === "children") {
-      return value.map((c) => c._id);
+      return value.map((c) => c.key);
     }
     return value;
   };
@@ -47,21 +39,21 @@ globalThis.onEvent = (id, type, value) => {
 
 class Elm {
   constructor(t) {
-    this._id = uuid();
+    this.key = uuid();
     this.type = t;
     this.children = [];
     this.attributes = {};
     this.style = {};
     this.listeners = {};
-    registry[this._id] = this;
+    registry[this.key] = this;
   }
 
   appendChild(c) {
-    c._parent = this._id;
+    c._parent = this.key;
     this.children.push(c);
     sendMessage(
       "onAppend",
-      JSON.stringify({ element: this._id, child: c._id })
+      JSON.stringify({ element: this.key, child: c.key })
     );
   }
 
@@ -70,39 +62,45 @@ class Elm {
     if (idx != -1) {
       this.children.splice(idx, 1);
     }
-
     sendMessage(
       "onRemove",
-      JSON.stringify({ element: this._id, child: c._id })
+      JSON.stringify({ element: this.key, child: c.key })
     );
   }
 
   insertBefore(c, b) {
-    let idx = this.children.indexOf(b);
-    if (idx != -1) {
-      this.children.splice(idx, 0, c);
-    }
+    // let idx = this.children.indexOf(b);
+    // if (idx != -1) {
+    //   this.children.splice(idx, 0, c);
+    // }
+    // todo
+    c._parent = this.key;
+    this.children.push(c);
+    sendMessage(
+      "onAppend",
+      JSON.stringify({ element: this.key, child: c.key })
+    );
   }
 
   setAttribute(a, v) {
     this.attributes[a] = v;
     sendMessage(
       "onUpdate",
-      JSON.stringify({ element: this._id, attributes: { [a]: v } })
+      JSON.stringify({ element: this.key, attributes: { [a]: v } })
     );
   }
 
   removeAttribute(a) {
     erase(this.attributes[a]);
-    // sendMessage('onUpdate', JSON.stringify({ element: this._id }));
+    // sendMessage('onUpdate', JSON.stringify({ element: this.key }));
   }
 
   addEventListener(eventName, callback) {
     this.listeners[eventName] = callback;
-    console.log("listen: " + this._id + ", " + eventName);
+    console.log("listen: " + this.key + ", " + eventName);
     sendMessage(
       "onUpdate",
-      JSON.stringify({ element: this._id, events: { [eventName]: "function" } })
+      JSON.stringify({ element: this.key, events: { [eventName]: "function" } })
     );
   }
 
@@ -134,13 +132,13 @@ class Doc extends Elm {
     sendMessage("onCreate", JSON.stringify(this, getCircularReplacer()));
   }
 
-  createElement(t,p) {
+  createElement(t, p) {
     let res = new Elm(t);
-    Object.keys(p).forEach(k => {
-      if (typeof(p[k]) !== 'object') {
+    Object.keys(p).forEach((k) => {
+      if (typeof p[k] !== "object") {
         res.attributes[k] = p[k];
-      } else if (k == 'style') {
-        res.attributes['style'] = this.toStyleObject(p[k]);
+      } else if (k == "style") {
+        res.attributes["style"] = this.toStyleObject(p[k]);
       }
     });
     sendMessage("onCreate", JSON.stringify(res, getCircularReplacer()));

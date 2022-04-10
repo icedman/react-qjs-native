@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_js/flutter_js.dart';
 
+import './components/component.dart';
 import './element.dart' as React;
 
 React.Registry registry = React.Registry.instance();
@@ -57,25 +58,16 @@ class _MyHomePageState extends State<MyHomePage> {
       print(args);
     });
     flutterJs.onMessage('onCreate', (dynamic args) {
-      // print('create... ${args['_id']}');
-      // if (args['type'] == 'textinput') {
-      //   print(args);
-      // }
       registry.createElement('', '', state: jsonEncode(args));
       setState(() {}); // ping
     });
     flutterJs.onMessage('onAppend', (dynamic args) {
-      // print('append...');
-      // print(args);
       registry.appendChild(args['element'], args['child']);
     });
     flutterJs.onMessage('onRemove', (dynamic args) {
-      // print('remove...');
-      //  print(args);
+      registry.removeChild(args['element'], args['child']);
     });
     flutterJs.onMessage('onUpdate', (dynamic args) {
-      // print('update...');
-      // print(args);
       registry.updateElement(args['element'], jsonEncode(args));
     });
 
@@ -102,8 +94,9 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: MultiProvider(providers: [
+        ChangeNotifierProvider(create: (context) => StyleProvider({})),
         ChangeNotifierProvider(create: (context) => root.state),
-      ], child: root.builder(context)),
+      ], child: Column(children: [ root.builder(context) ])),
     );
   }
 }

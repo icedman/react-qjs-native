@@ -16,6 +16,7 @@ export default class TextInput extends Component {
         value={this.props.value}
         style={{ ...this.props.style }}
         onChangeText={this.props.onChangeText}
+        onSubmitEditing={this.props.onSubmitEditing}
       >
         {this.props.children}
       </textinput>

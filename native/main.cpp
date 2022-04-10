@@ -92,17 +92,16 @@ int main(int argc, char **argv)
     JS_SetModuleLoaderFunc(rt, NULL, js_module_loader, NULL);
 
     // ctx = JS_NewContextRaw(rt);
-
     // JS_AddIntrinsicBaseObjects(ctx);
     // JS_AddIntrinsicEval(ctx);
 
     JSValue global_obj, app;
 
     global_obj = JS_GetGlobalObject(ctx);
-
-    app = JS_NewObject(ctx);
-    JS_SetPropertyStr(ctx, app, "log", JS_NewCFunction(ctx, js_log, "log", 1));
-    JS_SetPropertyStr(ctx, global_obj, "app", app);
+    JS_SetPropertyStr(ctx, global_obj, "sendMessage", JS_NewCFunction(ctx, js_log, "log", 1));
+    // app = JS_NewObject(ctx);
+    // JS_SetPropertyStr(ctx, app, "log", JS_NewCFunction(ctx, js_log, "log", 1));
+    // JS_SetPropertyStr(ctx, global_obj, "app", app);
     JS_FreeValue(ctx, global_obj);
 
     JSValue ret;

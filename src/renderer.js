@@ -6,7 +6,7 @@ function getCircularReplacer() {
   const seen = new WeakSet();
   return (key, value) => {
     if (key === "children") {
-      return value.map((c) => c._id);
+      return value.map((c) => c.key);
     }
     return value;
   };

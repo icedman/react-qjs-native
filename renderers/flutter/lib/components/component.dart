@@ -22,24 +22,46 @@ class Component {
 
   BoxDecoration boxStyle(dynamic style) {
     Color? color;
+    Border? border;
     if (style['color'] != null) {
-      color = hexToColor(style['color'] ?? '#000000');
+      color = hexToColor(style['background'] ?? '#ffffff');
     }
-    return BoxDecoration(color: color);
+    if (style['borderColor'] != null) {
+      Color borderColor = hexToColor(style['borderColor'] ?? '#ffffff');
+      border = Border.all(color: borderColor);
+    }
+    return BoxDecoration(color: color, border: border);
   }
 
-  Widget expand(Widget widget) {
-    return Expanded(child: widget);
+  Widget expand(Widget widget, dynamic style) {
+    String height = style['height'] ?? '';
+    if (height != '') {
+      int px = height.indexOf('px');
+      if (px != -1) {
+        height = height.substring(0, px);
+      }
+      return Container(height: int.parse(height).toDouble(), child: widget);
+    }
+    String width = style['width'] ?? '';
+    if (width != '') {
+      int px = width.indexOf('px');
+      if (px != -1) {
+        width = width.substring(0, px);
+      }
+      return Container(width: int.parse(width).toDouble(), child: widget);
+    }
+    int flex = style['flex'] ?? 1;
+    return Expanded(flex: flex, child: Align(alignment: Alignment.center, child: widget));
   }
 
   Widget decorate(Widget widget, dynamic style) {
     return Container(child: widget, decoration: boxStyle(style));
   }
 
-  List<Widget> expandEach(List<Widget> widgets) {
+  List<Widget> expandEach(List<Widget> widgets, dynamic style) {
     List<Widget> res = [];
     for (final c in widgets) {
-      res.add(expand(c));
+      res.add(expand(c, style));
     }
     return res;
   }
@@ -53,8 +75,33 @@ class Component {
   }
 }
 
+class StyleProvider extends ChangeNotifier {
+  StyleProvider(this.style);
+  dynamic style;
+}
+
 class StateProvider extends ChangeNotifier {
-  dynamic json = jsonDecode('{}');
+  StateProvider({StateProvider? state}) : super() {
+    if (state != null) {
+      state.proxy = this;
+      _json = state.raw();
+      _attributes = state.attributes();
+      _style = state.style();
+    }
+  }
+
+  @override
+  void notifyListeners() {
+    if (proxy != null) {
+      proxy?.notifyListeners();
+      return;
+    }
+    super.notifyListeners();
+  }
+
+  StateProvider? proxy;
+
+  dynamic _json = jsonDecode('{}');
   dynamic _attributes = {};
   dynamic _style = {};
 
@@ -74,7 +121,7 @@ class StateProvider extends ChangeNotifier {
           }
         }
       }
-      json[k] = newState[k];
+      _json[k] = newState[k];
     }
     notifyListeners();
   }
@@ -85,5 +132,9 @@ class StateProvider extends ChangeNotifier {
 
   dynamic style() {
     return _style;
+  }
+
+  dynamic raw() {
+    return _json;
   }
 }

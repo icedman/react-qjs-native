@@ -6,6 +6,7 @@ import 'package:flutter_js/flutter_js.dart';
 import 'package:provider/provider.dart';
 
 import './component.dart';
+import './text.dart';
 import '../element.dart' as React;
 
 class ViewElement extends StatelessWidget with Component {
@@ -25,15 +26,10 @@ class ViewElement extends StatelessWidget with Component {
     dynamic style = state.style();
     flexDirection = style['flexDirection'] ?? flexDirection;
 
-    List<Widget> ct = [];
-    if (textContent != null) {
-      ct.add(Text(textContent ?? ''));
-    }
-
     if (flexDirection == 'column') {
-      return decorate(Column(children: expandEach([...ct, ...this.children ?? []])), style);
+      return decorate(Column(children: (this.children ?? [])), style);
     } else {
-      return decorate(Row(children: expandEach([...ct, ...this.children ?? []])), style);
+      return decorate(Row(children: (this.children ?? [])), style);
     }
   }
 }

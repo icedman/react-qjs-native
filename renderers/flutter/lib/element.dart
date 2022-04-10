@@ -6,10 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:flutter_js/flutter_js.dart';
 
 import './components/component.dart';
-import './components/text.dart';
 import './components/view.dart';
+import './components/scrollview.dart';
+import './components/text.dart';
 import './components/textinput.dart';
 import './components/button.dart';
+import './components/flatlist.dart';
 
 class Element extends Object {
   String id = '';
@@ -24,7 +26,7 @@ class Element extends Object {
 
   @override
   String toString() {
-    return 'Element: ${state.json}';
+    return 'Element: ${state.raw()}';
   }
 }
 
@@ -43,11 +45,11 @@ class Registry {
     Element element = Element();
     element.state.setState(state);
 
-    if (element.state.json.containsKey('_id')) {
-      id = element.state.json['_id'];
+    if (element.state.raw().containsKey('key')) {
+      id = element.state.raw()['key'];
     }
-    if (element.state.json.containsKey('type')) {
-      type = element.state.json['type'];
+    if (element.state.raw().containsKey('type')) {
+      type = element.state.raw()['type'];
     }
 
     element.id = id;
@@ -71,8 +73,8 @@ class Registry {
     for (final k in elements.keys) {
       Element? e = elements[k];
       if (e != null &&
-          e.state.json.contains('type') &&
-          e.state.json['type'] == type) {
+          e.state.raw().contains('type') &&
+          e.state.raw()['type'] == type) {
         return e;
       }
     }
@@ -97,9 +99,7 @@ class Registry {
     elm?.children.add(child);
     elm?.state.notifyListeners();
     Element? celm = findById(child);
-    if (celm != null) {
-      celm.parent = elm?.id ?? '';
-    }
+    celm?.parent = elm?.id ?? '';
   }
 
   void removeChild(String parent, String child) {
@@ -110,7 +110,7 @@ class Registry {
   }
 }
 
-class ElementWidget extends StatelessWidget {
+class ElementWidget extends StatelessWidget with Component {
   ElementWidget({Element? this.element});
   Element? element;
 
@@ -121,10 +121,17 @@ class ElementWidget extends StatelessWidget {
     // extract children
     List<Widget> cc = (element?.children ?? [])
         .map(
-          (c) => MultiProvider(providers: [
+          (c) {
+            Element? elm = Registry.instance().element(c);
+            return MultiProvider(providers: [
+            if (elm.state.style().keys.isNotEmpty) ...[
+              ChangeNotifierProvider(
+                  create: (context) => StyleProvider(elm.state.style())),
+            ],
             ChangeNotifierProvider(
-                create: (context) => Registry.instance().element(c).state),
-          ], child: Registry.instance().element(c).builder(context)),
+                create: (context) => StateProvider(state: elm.state))
+          ], child: elm.builder(context));
+          },
         )
         .toList();
 
@@ -132,12 +139,10 @@ class ElementWidget extends StatelessWidget {
     String? textContent;
     textContent = state.attributes()['textContent'];
 
-    // extract styles
-
     // extract events
     bool hasEvents = false;
-    if (state.json['events'] != null) {
-      final events = state.json['events'];
+    if (state.raw()['events'] != null) {
+      final events = state.raw()['events'];
       if (events['onClick'] != null) {
         hasEvents = true;
       }
@@ -145,17 +150,26 @@ class ElementWidget extends StatelessWidget {
 
     Widget? child;
 
+    // factory
     if ((element?.type ?? '') == 'textinput') {
       child =
           TextInputElement(element: element);
     }
     if ((element?.type ?? '') == 'button') {
       child =
-          ButtonElement(element: element, children: cc, textContent: textContent);
+          ButtonElement(element: element, children: cc);
     }
-
-    if (child == null && cc.length == 0 && textContent != null) {
-      child = TextElement(element: element, textContent: textContent);
+    if ((element?.type ?? '') == 'text') {
+      child =
+          TextElement(element: element, children: cc, textContent: textContent);
+    }
+    if ((element?.type ?? '') == 'scrollview') {
+      child =
+          ScrollElement(element: element, children: cc, textContent: textContent);
+    }
+    if ((element?.type ?? '') == 'flatlist') {
+      child =
+          FlatList(element: element, children: cc, textContent: textContent);
     }
 
     // fallback to View
@@ -165,7 +179,7 @@ class ElementWidget extends StatelessWidget {
     }
 
     if (hasEvents) {
-      return GestureDetector(
+      child = GestureDetector(
           onTapDown: (details) {
             try {
               final script = 'onEvent("${element?.id}", "onClick")';
@@ -176,6 +190,6 @@ class ElementWidget extends StatelessWidget {
           },
           child: child);
     }
-    return child;
+    return expand(child, state.style());
   }
 }

@@ -39,6 +39,16 @@ class _TextInputElement extends State<TextInputElement> with Component {
     StateProvider state = Provider.of<StateProvider>(context);
     return TextField(
         controller: controller,
+        onSubmitted: (v) {
+          try {
+            final script =
+                'onEvent("${widget.element?.id}", "onSubmitEditing", "$v")';
+            JsEvalResult? jsResult =
+                React.Registry.instance().js?.evaluate(script);
+          } catch (err, msg) {
+            print(err);
+          }
+        },
         onChanged: (v) {
           try {
             final script =

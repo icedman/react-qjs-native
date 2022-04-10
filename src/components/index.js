@@ -4,5 +4,6 @@ import Image from "./image";
 import TextInput from "./textinput";
 import Button from "./button";
 import ScrollView from "./scrollview";
+import FlatList from "./flatlist";
 
-export { Text, View, Image, TextInput, Button, ScrollView };
+export { Text, View, Image, TextInput, Button, ScrollView, FlatList };
