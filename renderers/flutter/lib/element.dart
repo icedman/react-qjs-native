@@ -56,6 +56,8 @@ class Registry {
     element.id = id;
     element.type = type;
     elements[id] = element;
+    
+    updateElement(id, state);
     return element;
   }
 

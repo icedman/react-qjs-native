@@ -66,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
       print(args);
     });
     flutterJs.onMessage('onCreate', (dynamic args) {
+      // print(args);
       registry.createElement('', '', state: jsonEncode(args));
       setState(() {}); // ping
     });
@@ -76,13 +77,20 @@ class _MyHomePageState extends State<MyHomePage> {
       registry.removeChild(args['element'], args['child']);
     });
     flutterJs.onMessage('onUpdate', (dynamic args) {
+    print(args);
       registry.updateElement(args['element'], jsonEncode(args));
     });
 
-    React.Registry.instance().js = flutterJs;
+    registry.js = flutterJs;
+    
+    // registry.createElement('root', 'document');
+    // registry.createElement('text1', 'text', state: jsonEncode({'attributes': {'textContent': 'hello world', 'style': {'color':'#ff0000'}}}));
+    // Future.delayed(const Duration(milliseconds: 2000), () {
+    // registry.updateElement('text1', jsonEncode({'attributes': {'textContent': 'hello flutter+react'}}));
+    // });
+    // registry.appendChild('root', 'text1');
 
     runScriptAsset('scripts/app.js');
-    // runScript('../../dist/app.js');
   }
 
   @override
