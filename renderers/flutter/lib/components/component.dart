@@ -137,12 +137,12 @@ class StateProvider extends ChangeNotifier {
 
   StateProvider? proxy;
 
-  dynamic _json = jsonDecode('{}');
+  dynamic _json = {};
   dynamic _attributes = {};
   dynamic _style = {};
 
-  void setState(String s) {
-    var newState = jsonDecode(s); // merge
+  void setState(dynamic newState) {
+    newState = newState ?? {};
     for (var k in newState.keys) {
       if (k == 'attributes') {
         dynamic obj = newState[k];

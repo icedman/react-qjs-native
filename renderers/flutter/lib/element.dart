@@ -42,7 +42,7 @@ class Registry {
 
   Map<String, Element> elements = <String, Element>{};
 
-  Element createElement(String id, String type, {String state = '{}'}) {
+  Element createElement(String id, String type, {dynamic state}) {
     Element element = Element();
     element.state.setState(state);
 
@@ -56,8 +56,8 @@ class Registry {
     element.id = id;
     element.type = type;
     elements[id] = element;
-    
-    updateElement(id, state);
+
+    // updateElement(id, state);
     return element;
   }
 
@@ -90,7 +90,7 @@ class Registry {
     }
   }
 
-  void updateElement(String id, String state) {
+  void updateElement(String id, dynamic state) {
     if (!elements.containsKey(id)) return;
     Element? elm = elements[id];
     elm?.state.setState(state);
